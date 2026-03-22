@@ -52,7 +52,7 @@ query_engine = index.as_query_engine(
 async def main():
     print("Running query...")
     t1 = time.time()
-    response = await query_engine.aquery("What is the raven?") # what is this article about?
+    response = await query_engine.aquery("Who is the first person to land on the moon?") # what is this article about?
     t2 = time.time()
     print(f"Embed + search + llm took: {t2 - t1:.2f}s")  
     print(response)
