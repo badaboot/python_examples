@@ -1,0 +1,3 @@
+__pycache__/
+llama_index/storage/
+glove.6B.50d.txt
