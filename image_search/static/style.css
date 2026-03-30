@@ -1,0 +1,205 @@
+      * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+      }
+
+      body {
+          font-family: "Segoe UI", sans-serif;
+          background: #0f0f0f;
+          color: #e8e0d0;
+          min-height: 100vh;
+          padding: 40px 20px;
+      }
+
+      h1 {
+          text-align: center;
+          font-size: 1.6rem;
+          font-weight: 400;
+          letter-spacing: 0.1em;
+          color: #c9a96e;
+          margin-bottom: 8px;
+      }
+
+      .subtitle {
+          text-align: center;
+          font-size: 0.85rem;
+          color: #666;
+          margin-bottom: 40px;
+      }
+
+      .search-box {
+          max-width: 700px;
+          margin: 0 auto 40px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+      }
+
+      .row {
+          display: flex;
+          gap: 10px;
+      }
+
+      input,
+      select {
+          background: #1a1a1a;
+          border: 1px solid #333;
+          color: #e8e0d0;
+          border-radius: 6px;
+          padding: 10px 14px;
+          font-size: 0.95rem;
+          outline: none;
+          transition: border-color 0.2s;
+      }
+
+      input:focus,
+      select:focus {
+          border-color: #c9a96e;
+      }
+
+      #folder {
+          flex: 1;
+      }
+
+      #query {
+          flex: 1;
+      }
+
+      select {
+          width: 110px;
+          flex-shrink: 0;
+      }
+
+      button {
+          background: #c9a96e;
+          color: #0f0f0f;
+          border: none;
+          border-radius: 6px;
+          padding: 10px 24px;
+          font-size: 0.95rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s;
+          white-space: nowrap;
+      }
+
+      button:hover {
+          background: #e0c080;
+      }
+
+      button:disabled {
+          background: #444;
+          color: #888;
+          cursor: not-allowed;
+      }
+
+      .status {
+          text-align: center;
+          font-size: 0.85rem;
+          color: #888;
+          min-height: 20px;
+      }
+
+      .status.error {
+          color: #e07070;
+      }
+
+      .results {
+          max-width: 700px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+
+      .result-card {
+          background: #1a1a1a;
+          border: 1px solid #2a2a2a;
+          border-radius: 8px;
+          padding: 14px 18px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          animation: fadeIn 0.2s ease;
+      }
+
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+              transform: translateY(6px);
+          }
+
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+
+      .rank {
+          font-size: 1.4rem;
+          color: #c9a96e;
+          font-weight: 700;
+          width: 28px;
+          text-align: center;
+          flex-shrink: 0;
+      }
+
+      .file-info {
+          flex: 1;
+          overflow: hidden;
+      }
+
+      .filename {
+          font-size: 0.95rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+
+      .filepath {
+          font-size: 0.75rem;
+          color: #555;
+          margin-top: 3px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+
+      .score-bar-wrap {
+          width: 120px;
+          flex-shrink: 0;
+          text-align: right;
+      }
+
+      .score-label {
+          font-size: 0.8rem;
+          color: #c9a96e;
+          margin-bottom: 4px;
+      }
+
+      .score-bar-bg {
+          background: #2a2a2a;
+          border-radius: 4px;
+          height: 6px;
+          overflow: hidden;
+      }
+
+      .score-bar-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #c9a96e, #e0c080);
+          border-radius: 4px;
+          transition: width 0.4s ease;
+      }
+
+      .query-tag {
+          text-align: center;
+          font-size: 0.8rem;
+          color: #555;
+          margin-bottom: 16px;
+      }
+
+      .query-tag span {
+          color: #c9a96e;
+          font-style: italic;
+      }

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLIP Image Search</title>
+    <link href="/static/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1>CLIP Image Search</h1>
+    <p class="subtitle">Semantic search across your image library</p>
+
+    <div class="search-box">
+      <div class="row">
+        <input
+          id="query"
+          type="text"
+          placeholder='Query  e.g. "mongol warrior armor"'
+        />
+        <select id="topk">
+          <option value="3">Top 3</option>
+          <option value="5" selected>Top 5</option>
+          <option value="10">Top 10</option>
+        </select>
+        <button id="searchBtn" onclick="runSearch()">Search</button>
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="results" id="results"></div>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
