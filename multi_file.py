@@ -40,7 +40,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
 
 images, paths = load_images_from_folder("sample_img", preprocess, device)
-text = clip.tokenize(["a photo of a cat"]).to(device)
+text = clip.tokenize(["cdrama male character"]).to(device)
 
 with torch.no_grad():
     image_features = model.encode_image(images)
