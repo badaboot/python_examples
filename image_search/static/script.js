@@ -4,6 +4,13 @@ document.getElementById("query").addEventListener("keydown", (e) => {
     if (e.key === "Enter") runSearch();
 });
 
+function clearQuery() {
+    document.getElementById("query").value = "";
+    document.getElementById("query").focus();
+    document.getElementById("results").innerHTML = "";
+    setStatus("");
+}
+
 async function runSearch() {
     const query = document.getElementById("query").value.trim();
     const top_k = parseInt(document.getElementById("topk").value);

@@ -12,11 +12,33 @@
 
     <div class="search-box">
       <div class="row">
-        <input
-          id="query"
-          type="text"
-          placeholder='Query  e.g. "mongol warrior armor"'
-        />
+        <div style="position: relative; flex: 1">
+          <input
+            id="query"
+            type="text"
+            placeholder='Query  e.g. "mongol warrior armor"'
+            style="width: 100%; padding-right: 36px"
+          />
+          <button
+            onclick="clearQuery()"
+            style="
+              position: absolute;
+              right: 8px;
+              top: 50%;
+              transform: translateY(-50%);
+              background: none;
+              border: none;
+              color: #555;
+              font-size: 1.1rem;
+              cursor: pointer;
+              padding: 0;
+              line-height: 1;
+            "
+            title="Clear"
+          >
+            ✕
+          </button>
+        </div>
         <select id="topk">
           <option value="3">Top 3</option>
           <option value="5" selected>Top 5</option>
