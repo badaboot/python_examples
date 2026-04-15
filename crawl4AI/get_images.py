@@ -2,7 +2,7 @@ import asyncio
 import re
 import sys
 from urllib.parse import urlencode
-from crawl4ai import *
+from crawl4ai import AsyncWebCrawler
 
 def get_query():
     if len(sys.argv) < 2:

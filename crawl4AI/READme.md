@@ -2,13 +2,15 @@
 
 Steps
 
-1. run `get_markdown.py > page.md` to get markdown from a url
-2. run `parse_markdown.py > parsed_urls.json` to get the image urls from a markdown
-
 ### Get images from google images search
 
-3. `python3 crawl4AI/get_images.py 'tokyo ghoul illustration' > image_urls.txt`
-4. `source crawl4AI/download_images.sh image_urls.txt`
+1. `python3 crawl4AI/get_images.py 'tokyo ghoul illustration' > image_urls.txt`
+2. `python3 crawl4AI/download_images.py image_urls.txt` # creates folder with query name
+
+### Get images from wikimedia
+
+1. `python3 crawl4AI/wikimedia.py > image_urls.txt`
+2. `source crawl4AI/download_images.sh image_urls.txt` # creates folder with date timestamp
 
 ### Known issues
 
