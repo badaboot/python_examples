@@ -4,6 +4,9 @@ import sys
 from urllib.parse import urlencode
 from crawl4ai import AsyncWebCrawler
 
+# usage: python3 crawl4AI/get_images.py 'tokyo ghoul illustration' > image_urls.txt
+# then `python3 crawl4AI/download_images.py image_urls.txt` # creates folder with query name
+
 def get_query():
     if len(sys.argv) < 2:
         print("Usage: python get_images.py '<search query>'")

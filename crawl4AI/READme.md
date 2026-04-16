@@ -16,7 +16,3 @@ Steps
 
 1. Reddit image preview fails to download image: Failed (HTTP 403) — https://preview.redd.it/some-of-sui-ishidas-illustrations-part-2-v0-e6oajgt1hxt81.jpg
 2. LinkedIn scrape: get login page
-
-TODO:
-
-5. `get_markdown`: change to dynamic URL. current URL is static
