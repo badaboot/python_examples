@@ -2,11 +2,6 @@
 
 Steps
 
-### Get images from google images search
-
-1. `python3 crawl4AI/get_images.py 'tokyo ghoul illustration' > image_urls.txt`
-2. `python3 crawl4AI/download_images.py image_urls.txt` # creates folder with query name
-
 ### Get images from wikimedia
 
 1. `python3 crawl4AI/wikimedia.py > image_urls.txt`
