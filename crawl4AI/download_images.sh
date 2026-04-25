@@ -1,6 +1,6 @@
-bash#!/bin/bash
+#!/bin/bash
 
-# Usage: ./download_images.sh urls.txt
+# Usage: ./download_images.sh urls.txt optional_folder_name
 
 if [[ -z "$1" ]]; then
   echo "Usage: $0 <urls.txt>"
@@ -12,8 +12,15 @@ if [[ ! -f "$1" ]]; then
   exit 1
 fi
 
-folder_name="$(date +%Y-%m-%d_%H-%M-%S)"
-mkdir -p "downloaded_images/$folder_name"
+if [ -n "$2" ]; then
+  echo "Folder name: '$2'"
+  folder_name=$2
+  mkdir -p "downloaded_images/$2"
+else
+  folder_name="$(date +%Y-%m-%d_%H-%M-%S)"
+  mkdir -p "downloaded_images/$folder_name"
+fi
+
 
 SUCCESS=0
 FAILED=0
@@ -52,4 +59,3 @@ done < "$1"
 
 echo ""
 echo "Done — $SUCCESS succeeded, $FAILED failed"
-```
