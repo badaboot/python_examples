@@ -1,4 +1,5 @@
 __pycache__/
+audio/
 llama_index/storage/
 glove.6B.50d.txt
 downloaded_images/

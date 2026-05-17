@@ -3,7 +3,7 @@ import os
 import sys
 
 # python3 download_youtube_audio.py 'https://www.youtube.com/watch?v=wAaKxOkdd8c'
-print(f"Script name: {sys.argv[0]} another {sys.argv[1]}")
+print(f"Received: {sys.argv[0]} file {sys.argv[1]}")
 if len(sys.argv) < 2:
     print("Usage: python script.py <youtube_url>")
     sys.exit(1)
@@ -27,7 +27,6 @@ with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     # Construct filename based on how yt-dlp saves it
     filename = ydl.prepare_filename(info).rsplit('.', 1)[0] + ".mp3"
     print(f"Downloaded file: {filename}")
-    ydl.download([url])
 
 #  move filename to audio folder
 if not os.path.exists('audio'):
