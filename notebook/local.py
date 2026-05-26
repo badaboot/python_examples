@@ -7,8 +7,15 @@ app = marimo.App()
 
 
 @app.cell
-def _(df, pl):
-    import altair as alt
+def _(mo):
+    mo.md("""
+    <h1>Project 100 reach outs</h1>
+    """)
+    return
+
+
+@app.cell
+def _(df, mo, pl):
     chart_data = (
         df.with_columns(
             (pl.col("reaction (y/n)") == "y").alias("reaction_bool")
@@ -16,6 +23,17 @@ def _(df, pl):
         .group_by("reaction_bool")
         .agg(pl.len().alias("count"))
     )
+
+    # Displaying the variable in a large font
+    earliest = df["date"].min()
+    mo.md(f"<h3>Since <span style='background-color: #FFFF00'>{earliest}</span> I have reached out to <span style='background-color: #FFFF00'>{df.height}</span> people</h3>")
+
+    return (chart_data,)
+
+
+@app.cell
+def _(chart_data):
+    import altair as alt
 
     # 2. Build the pie chart in Altair
     pie_chart = (
@@ -109,7 +127,7 @@ def _(alt, df, pl):
 
 @app.cell
 def _():
-    import marimo as mo
+
 
     import polars as pl
     df = pl.read_csv('static/reach_out.csv')

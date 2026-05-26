@@ -10,10 +10,57 @@ app = marimo.App()
 def _():
     import marimo as mo
 
+    # Read a local file and render its content
+    with open("static/page.html", "r") as f:
+       content = f.read()
+    renderedContent = mo.Html(content)
+    renderedContent
+    return (mo,)
+
+
+@app.cell
+def _(mo):
+    # Initialize state with 0
+    get_count, set_count = mo.state(0)
+    return get_count, set_count
+
+
+@app.cell
+def _(mo, set_count):
+
+    # A button to increment the count
+    increment = mo.ui.button(label="Increment", on_click=lambda _: set_count(lambda c: c + 1))
+    increment
+
+    return
+
+
+@app.cell
+def _(mo):
+    slider = mo.ui.slider(start=20, stop=100, step=5, value=50, label="Font Size")
+    return (slider,)
+
+
+@app.cell
+def _(get_count, mo, slider):
+    # Create a reactive markdown block that updates when the slider moves
+    size_config = mo.md(
+        f"""
+        <h1 style="font-size: {slider.value}px;">Current count: <span class="highlight">{get_count()}</span></h1>
+        {slider}
+        """
+    )
+    size_config
+    return
+
+
+@app.cell
+def _(mo):
+
 
     text = mo.ui.text(placeholder="Search...", label="Filter")
     text
-    return mo, text
+    return (text,)
 
 
 @app.cell
@@ -49,11 +96,12 @@ def _():
 
 
 @app.cell
-def _():
+def _(mo):
     import polars as pl
 
 
-    # chick_df = pl.read_csv('data/chickenweight.csv')
+    df = pl.read_csv('static/chickweight.csv')
+    mo.inspect(df)
     return
 
 
