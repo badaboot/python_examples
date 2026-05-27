@@ -31,7 +31,6 @@ def _(mo, set_count):
     # A button to increment the count
     increment = mo.ui.button(label="Increment", on_click=lambda _: set_count(lambda c: c + 1))
     increment
-
     return
 
 

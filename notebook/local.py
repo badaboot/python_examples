@@ -15,7 +15,8 @@ def _(mo):
 
 
 @app.cell
-def _(df, mo, pl):
+def _(df, pl):
+    import marimo as mo
     chart_data = (
         df.with_columns(
             (pl.col("reaction (y/n)") == "y").alias("reaction_bool")
@@ -27,8 +28,7 @@ def _(df, mo, pl):
     # Displaying the variable in a large font
     earliest = df["date"].min()
     mo.md(f"<h3>Since <span style='background-color: #FFFF00'>{earliest}</span> I have reached out to <span style='background-color: #FFFF00'>{df.height}</span> people</h3>")
-
-    return (chart_data,)
+    return chart_data, mo
 
 
 @app.cell
@@ -137,7 +137,6 @@ def _():
     )
 
     df.tail()
-
     return df, pl
 
 
