@@ -52,7 +52,7 @@ def _():
             width=600,
             height=300,
             title=alt.TitleParams(
-                text="Character Distribution by Ethnicity and Category",
+                text="Character Ethnicity + Category",
                 anchor="start",
                 frame="group",
             ),
@@ -148,7 +148,7 @@ def _(alt, pl):
         width=480,
         height=400,
         title=alt.TitleParams(
-            text="Character names + Ethnicities",
+            text="Character Name + Ethnicity",
             anchor='middle',
             fontSize=24
         )
