@@ -1,0 +1,114 @@
+import marimo
+
+__generated_with = "0.17.6"
+app = marimo.App(width="medium")
+
+
+@app.cell
+def _():
+    import polars as pl
+    import altair as alt
+    import numpy as np
+
+    # 1. Load and clean the dataset
+    df = pl.read_csv("static/name_ethnicity.csv")
+    df = df.with_columns(
+        [pl.col("name").str.strip_chars(), pl.col("ethnicity").str.strip_chars()]
+    ).sort("ethnicity")
+
+    # 2. Compute the base grid geometry
+    columns = 5
+    num_rows = df.height
+
+    grid_x = [i % columns for i in range(num_rows)]
+    grid_y = [i // columns for i in range(num_rows)]
+
+    df = df.with_columns(
+        [pl.Series("grid_x", grid_x), pl.Series("grid_y", grid_y)]
+    )
+
+    # 3. Calculate raw hexagonal packing positions
+    df = df.with_columns(
+        [
+            pl.when(pl.col("grid_y") % 2 == 1)
+            .then(pl.col("grid_x") + 0.5)
+            .otherwise(pl.col("grid_x"))
+            .alias("raw_x"),
+            (pl.col("grid_y") * 0.82).alias("raw_y"),  # Adjusted vertical spacing
+        ]
+    )
+
+    # 4. CENTER THE COORDINATES (New Step)
+    # Find the midpoints of the generated cluster and shift them to zero
+    mean_x = df["raw_x"].mean()
+    mean_y = df["raw_y"].mean()
+
+    df = df.with_columns(
+        [
+            (pl.col("raw_x") - mean_x).alias("x"),
+            (pl.col("raw_y") - mean_y).alias("y"),
+        ]
+    )
+
+    # 5. Build the tight-packed Bubble Chart
+    # We set symmetric scale domains around 0 so the chart container centers the data
+    max_range = 3.5  # This creates an invisible boundary window from -3.5 to +3.5
+
+    bubbles = (
+        alt.Chart(df)
+        .mark_circle(size=5800, opacity=1.0)
+        .encode(
+            x=alt.X(
+                "x:Q", axis=None, scale=alt.Scale(domain=[-max_range, max_range])
+            ),
+            y=alt.Y(
+                "y:Q",
+                axis=None,
+                scale=alt.Scale(reverse=True, domain=[-max_range, max_range]),
+            ),
+            color=alt.Color(
+                "ethnicity:N",
+                scale=alt.Scale(scheme="category10"),
+                title="Ethnicity",
+            ),
+            tooltip=["name", "ethnicity"],
+        )
+    )
+
+    # 6. Build the Text Label Layer
+    labels = (
+        alt.Chart(df)
+        .mark_text(
+            baseline="middle",
+            align="center",
+            color="white",
+            fontWeight="bold",
+            fontSize=14,
+        )
+        .encode(
+            x="x:Q", y=alt.Y("y:Q", scale=alt.Scale(reverse=True)), text="name:N"
+        )
+    )
+
+    # 7. Combine layers
+    chart = (
+        (bubbles + labels)
+        .properties(
+            width=850,
+            height=400,
+            title=alt.TitleParams(
+                text="Character Names x Ethnicity",
+                anchor="middle",
+                fontSize=24,
+            ),
+        )
+        .configure_view(strokeWidth=0)
+        # .configure(background="red")
+    )
+
+    chart.show()
+    return
+
+
+if __name__ == "__main__":
+    app.run()

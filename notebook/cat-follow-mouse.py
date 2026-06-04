@@ -10,6 +10,26 @@ app = marimo.App()
 def _():
     import marimo as mo
 
+    mo.Html(
+        """
+        <style>
+        h1 {
+            font-weight: bold; font-size: 24px;
+        }
+        a {
+        color: blue;
+        text-decoration: underline;
+        }
+        </style>
+        <h1>Simple HTML + CSS + JS example</h1>
+    <p>with <code>iframe</code> to get JS running. Inspired by this <a href='https://codepen.io/laurenhansen/pen/XeJGGv'>codepen</a> and this <a href='https://dev.to/alvarosabu/use-custom-emoji-as-a-cursor-using-css-3j7'>emoji how-to</a>.</p>
+    """
+    )
+    return (mo,)
+
+
+@app.cell
+def _(mo):
     cat_app_code = """
     <!DOCTYPE html>
     <html lang="en">

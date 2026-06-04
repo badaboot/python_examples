@@ -15,40 +15,93 @@ def _(mo):
 
 
 @app.cell
-def _(df, pl):
+def _():
+    import polars as pl
+    df = pl.read_csv('static/reach_out_anonymized.csv')
+    # 2. Cast string column to Date with a specific format
+    df = df.with_columns(
+        pl.col("date").str.to_date("%m/%d/%Y"),
+    )
+    return df, pl
+
+
+@app.cell
+def _(df):
     import marimo as mo
+    # chart_data = (
+    #     df.with_columns(
+    #         (pl.col("reaction (y/n)") == "y").alias("reaction_bool")
+    #     )
+    #     .group_by("reaction_bool")
+    #     .agg(pl.len().alias("count"))
+    # )
+
+    # Displaying the variable in a large font
+    earliest = df["date"].min()
+    mo.md(f"<h3>Since <span style='background-color: #FFFF00'>{earliest}</span> I have reached out to <span style='background-color: #FFFF00'>{df.height}</span> people</h3>")
+    return (mo,)
+
+
+@app.cell
+def _(df, pl):
+    import altair as alt
+
+    # df = pl.read_csv("networking.csv")
     chart_data = (
         df.with_columns(
             (pl.col("reaction (y/n)") == "y").alias("reaction_bool")
         )
         .group_by("reaction_bool")
         .agg(pl.len().alias("count"))
-    )
-
-    # Displaying the variable in a large font
-    earliest = df["date"].min()
-    mo.md(f"<h3>Since <span style='background-color: #FFFF00'>{earliest}</span> I have reached out to <span style='background-color: #FFFF00'>{df.height}</span> people</h3>")
-    return chart_data, mo
-
-
-@app.cell
-def _(chart_data):
-    import altair as alt
-
-    # 2. Build the pie chart in Altair
-    pie_chart = (
-        alt.Chart(chart_data)  # <-- No .to_pandas() needed
-        .mark_arc(outerRadius=120)
-        .encode(
-            theta=alt.Theta("count:Q"),
-            color=alt.Color("reaction_bool:N", title="Reaction Status: null/false vs true"),
-            tooltip=["reaction_bool", "count"],
-        ).properties(
-        title="Reaction status",
-
+        .with_columns(
+            pl.when(pl.col("reaction_bool"))
+            .then(pl.lit("Yes"))
+            .otherwise(pl.lit("No reaction"))
+            .alias("label")
         )
     )
-    pie_chart.show()
+ 
+    base_1 = alt.Chart(chart_data).encode(
+        theta=alt.Theta("count:Q", stack=True),
+        color=alt.Color(
+            "label:N",
+            scale=alt.Scale(
+                domain=["Yes", "No reaction"],
+                range=["#1a7fb8", "#cce5f5"],
+            ),
+            legend=alt.Legend(
+                title=None,
+                orient="right",
+                labelFontSize=13,
+                symbolSize=150,
+            ),
+        ),
+        tooltip=[
+            alt.Tooltip("label:N", title="Reaction"),
+            alt.Tooltip("count:Q", title="Count"),
+        ],
+    )
+ 
+    pie = base_1.mark_arc(outerRadius=150, color="black")
+ 
+    text = base_1.mark_text(radius=180, fontSize=14, fontWeight="bold").encode(
+        text=alt.Text("count:Q"),
+         color=alt.value("black")
+    )
+ 
+    chart = (
+        (pie + text)
+        .properties(
+            title=alt.TitleParams(
+                text="Networking Contacts: Reaction Breakdown",
+                fontSize=16,
+                anchor="middle",
+            ),
+            width=400,
+            height=400,
+        )
+    )
+    chart.show()
     return (alt,)
 
 
@@ -123,21 +176,6 @@ def _(alt, df, pl):
     )
     bullet_chart.show()
     return
-
-
-@app.cell
-def _():
-
-
-    import polars as pl
-    df = pl.read_csv('static/reach_out.csv')
-    # 2. Cast string column to Date with a specific format
-    df = df.with_columns(
-        pl.col("date").str.to_date("%m/%d/%Y"),
-    )
-
-    df.tail()
-    return df, pl
 
 
 if __name__ == "__main__":
