@@ -8,9 +8,72 @@ app = marimo.App()
 
 @app.cell
 def _():
-    import marimo as mo
-    import polars as pl
     import altair as alt
+    import polars as pl
+
+    # 1. Load the data from the CSV file
+    # (And add the constant column 'one' to enable dynamic circle stacking)
+    data = pl.read_csv("static/name_ethnicity.csv").with_columns(
+        pl.lit(1).alias("one")
+    )
+
+    dot_plot = (
+        alt.Chart(data)
+        .mark_circle(
+            size=600,  # Size of the dots
+            opacity=0.9,
+            stroke="white",  # Crisp white outline to separate stacked circles
+            strokeWidth=1,
+        )
+        .encode(
+            # X-Axis is now grouped by Ethnicity
+            x=alt.X(
+                "ethnicity:N",
+                title="Ethnicity",
+                axis=alt.Axis(
+                    labelAngle=-30, grid=False
+                ),  # Angled slightly for readability
+            ),
+            # Y-Axis stacks the circles perfectly on top of each other
+            y=alt.Y("sum(one):Q", title=None, stack=True, axis=None),
+            # Color breakdown is now by Category
+            color=alt.Color(
+                "category:N", title="Category", scale=alt.Scale(scheme="tableau10")
+            ),
+            # Ensures identical categories clump together sequentially inside each stack
+            order=alt.Order("category:N", sort="ascending"),
+            tooltip=[
+                alt.Tooltip("name:N", title="Name"),
+                alt.Tooltip("ethnicity:N", title="Ethnicity"),
+                alt.Tooltip("category:N", title="Category"),
+            ],
+        )
+        .properties(
+            width=600,
+            height=300,
+            title=alt.TitleParams(
+                text="Character Distribution by Ethnicity and Category",
+                anchor="start",
+                frame="group",
+            ),
+        )
+        .configure_view(strokeWidth=0)
+        .configure_legend(offset=-50, titleFontSize=16, labelFontSize=14)
+        .configure_title(dy=-20, fontSize=24, anchor="middle")
+    ).configure_axis(
+        labelFontSize=14,
+        titleFontSize=16
+    )
+
+    dot_plot.show()
+    return alt, pl
+
+
+@app.cell
+def _(alt, pl):
+    import marimo as mo
+    # import polars as pl
+    # import altair as alt
     import numpy as np
 
     # 1. Load and clean the dataset
@@ -81,7 +144,7 @@ def _():
     )
 
     # 7. Combine layers
-    chart = (bubbles + labels).properties(
+    packing_plot = (bubbles + labels).properties(
         width=480,
         height=400,
         title=alt.TitleParams(
@@ -99,7 +162,7 @@ def _():
         dy=-20,
     )
 
-    chart.show()
+    packing_plot.show()
     return
 
 
