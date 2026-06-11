@@ -27,11 +27,11 @@ def _():
         {time_slider}
         """
     )
-    return (time_slider,)
+    return mo, time_slider
 
 
 @app.cell
-def spiral_logic(plt, np, time_slider):
+def spiral_logic(np, plt, time_slider):
     # 1. SETUP CLEAN MATPLOTLIB CANVAS
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.set_xlim(-12, 12)
@@ -50,18 +50,18 @@ def spiral_logic(plt, np, time_slider):
     else:
         # Create a timeline array matching the current slider position
         t = np.linspace(0, current_step, current_step)
-        
+
         # Radius shrinks from 10 down to 0 over the 100-step timeline
         radius = 10 - (t * 0.1)
         angle = t * 0.5 
-        
+
         # Calculate all coordinate paths
         x_coords = radius * np.cos(angle)
         y_coords = radius * np.sin(angle)
 
         # Draw the trailing spiral line
         ax.plot(x_coords, y_coords, color="black", lw=2)
-        
+
         # TIP TRACKING: Grab the last item [-1] in the array to get the moving tip
         dot_x = x_coords[-1]
         dot_y = y_coords[-1]
@@ -72,7 +72,13 @@ def spiral_logic(plt, np, time_slider):
 
     # Output canvas object
     fig
-    return angle, current_step, dot_x, dot_y, fig, radius, t, x_coords, y_coords
+    return
+
+
+@app.cell
+def _(mo):
+    mo.image(src="static/duncan_opium.jpg")
+    return
 
 
 if __name__ == "__main__":
