@@ -7,106 +7,91 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import polars as pl
-    import altair as alt
-    import numpy as np
+    import matplotlib.pyplot as plt
 
-    # 1. Load and clean the dataset
-    df = pl.read_csv("static/name_ethnicity.csv")
-    df = df.with_columns(
-        [pl.col("name").str.strip_chars(), pl.col("ethnicity").str.strip_chars()]
-    ).sort("ethnicity")
+    # 1. Load data into a Polars DataFrame
+    data = [
+        {"event": "1: Magical notebook", "characters": "Vivian, Mrs. Arda, Mandukai, Pontano, Queen Berki, Miri"},
+        {"event": "2: Wedding night", "characters": "Vivian, Mandukai, Cecily, Princess Miri, Batbayar, Arban, Queen Berki"},
+        {"event": "3: Intelligence gathering", "characters": "Mandukai, Batbayar, Jin, Pontano, Prince Darden, King Leon"},
+        {"event": "4: Khan's proposal", "characters": "Miri, Queen Berki, Mandukai, Jin, Pontano, Prince Darden, King Leon"},
+        {"event": "5: Golden ticket", "characters": "Mandukai, Jin, BatBayar, Miri, Berki, Willem, Xian, King Leon, Schemeisser"},
+        {"event": "5.5 Surprise attack", "characters": "Mandukai, Jin, BatBayar, Xian, Willem, King Leon, Prince Darden, Queen Glor"}
+    ]
 
-    # 2. Compute the base grid geometry
-    columns = 5
-    num_rows = df.height
+    df = pl.DataFrame(data)
 
-    grid_x = [i % columns for i in range(num_rows)]
-    grid_y = [i // columns for i in range(num_rows)]
-
-    df = df.with_columns(
-        [pl.Series("grid_x", grid_x), pl.Series("grid_y", grid_y)]
-    )
-
-    # 3. Calculate raw hexagonal packing positions
-    df = df.with_columns(
-        [
-            pl.when(pl.col("grid_y") % 2 == 1)
-            .then(pl.col("grid_x") + 0.5)
-            .otherwise(pl.col("grid_x"))
-            .alias("raw_x"),
-            (pl.col("grid_y") * 0.82).alias("raw_y"),  # Adjusted vertical spacing
-        ]
-    )
-
-    # 4. CENTER THE COORDINATES (New Step)
-    # Find the midpoints of the generated cluster and shift them to zero
-    mean_x = df["raw_x"].mean()
-    mean_y = df["raw_y"].mean()
-
-    df = df.with_columns(
-        [
-            (pl.col("raw_x") - mean_x).alias("x"),
-            (pl.col("raw_y") - mean_y).alias("y"),
-        ]
-    )
-
-    # 5. Build the tight-packed Bubble Chart
-    # We set symmetric scale domains around 0 so the chart container centers the data
-    max_range = 3.5  # This creates an invisible boundary window from -3.5 to +3.5
-
-    bubbles = (
-        alt.Chart(df)
-        .mark_circle(size=5800, opacity=1.0)
-        .encode(
-            x=alt.X(
-                "x:Q", axis=None, scale=alt.Scale(domain=[-max_range, max_range])
-            ),
-            y=alt.Y(
-                "y:Q",
-                axis=None,
-                scale=alt.Scale(reverse=True, domain=[-max_range, max_range]),
-            ),
-            color=alt.Color(
-                "ethnicity:N",
-                scale=alt.Scale(scheme="category10"),
-                title="Ethnicity",
-            ),
-            tooltip=["name", "ethnicity"],
+    # 2. Process data using Polars expressions
+    df_exploded = (
+        df.with_columns(
+            pl.col("characters").str.split(", ")
         )
+        .explode("characters")
+        .rename({"characters": "Character"})
     )
 
-    # 6. Build the Text Label Layer
-    labels = (
-        alt.Chart(df)
-        .mark_text(
-            baseline="middle",
-            align="center",
-            color="white",
-            fontWeight="bold",
-            fontSize=14,
-        )
-        .encode(
-            x="x:Q", y=alt.Y("y:Q", scale=alt.Scale(reverse=True)), text="name:N"
-        )
+    # Standardize names
+    name_mapping = {
+        "Queen Berki": "Berki",
+        "Princess Miri": "Miri",
+        "BatBayar": "Batbayar"
+    }
+    df_exploded = df_exploded.with_columns(
+        pl.col("Character").replace(name_mapping)
     )
 
-    # 7. Combine layers
-    chart = (
-        (bubbles + labels)
-        .properties(
-            width=850,
-            height=400,
-            title=alt.TitleParams(
-                text="Character Names x Ethnicity",
-                anchor="middle",
-                fontSize=24,
-            ),
-        )
-        .configure_view(strokeWidth=0)
-        # .configure(background="red")
+    # 3. Compute Character Frequency and Sort
+    # We group by character, count occurrences, and sort descending
+    character_counts = (
+        df_exploded.group_by("Character")
+        .agg(pl.len().alias("count"))
+        .sort("count", descending=True)
     )
 
-    chart.show()
+    # Extract lists for plotting coordinates
+    events = df["event"].to_list()
+    characters_by_frequency = character_counts["Character"].to_list()
+
+    # 4. Native Matplotlib Color Mapping
+    cmap = plt.colormaps.get_cmap('tab20')
+    # Keep colors consistently mapped to the characters regardless of their frequency position
+    colors = [cmap(i) for i in range(len(characters_by_frequency))]
+    char_color_map = dict(zip(characters_by_frequency, colors))
+
+    # 5. Build the custom grid matrix
+    fig, ax = plt.subplots(figsize=(12, 8))
+
+    for c_idx, char in enumerate(characters_by_frequency):
+        for e_idx, event in enumerate(events):
+            presence = df_exploded.filter(
+                (pl.col("Character") == char) & (pl.col("event") == event)
+            )
+        
+            if not presence.is_empty():
+                color = char_color_map[char]
+                alpha = 1.0
+            else:
+                color = (0.95, 0.95, 0.95)  # Soft gray background for absence
+                alpha = 0.5
+            
+            rect = plt.Rectangle((e_idx - 0.45, c_idx - 0.45), 0.9, 0.9, color=color, alpha=alpha, ec='white', lw=1.5)
+            ax.add_patch(rect)
+
+    # 6. Format axes, labels, and display
+    ax.set_xlim(-0.6, len(events) - 0.4)
+    ax.set_ylim(-0.6, len(characters_by_frequency) - 0.4)
+    ax.set_xticks(range(len(events)))
+    ax.set_xticklabels(events, rotation=20, ha='right', fontsize=11)
+    ax.set_yticks(range(len(characters_by_frequency)))
+    ax.set_yticklabels(characters_by_frequency, fontsize=11)
+
+    ax.set_title("Character Presence Grid (Sorted by Most Frequent)", fontsize=14, pad=20, fontweight='bold')
+    ax.set_xlabel("Timeline / Events", fontsize=12, labelpad=10)
+    ax.set_ylabel("Characters (Most Frequent at Top)", fontsize=12, labelpad=10)
+
+    ax.invert_yaxis()  # Keeps the highest count at the top of the grid layout
+    plt.tight_layout()
+    plt.show()
     return
 
 

@@ -164,10 +164,17 @@ def _(mo):
         C C G G A A G — F F E E D D C — G G F F E E D — G G F F E E D — C C G G
         A A G — F F E E D D C
       </p>
-
       <script>
         // Ensure context is initialized inside the marimo environment
-        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx = null;
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // Resume context if browser suspended it
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
 
         const notes = {
           C: 261.63,
@@ -181,9 +188,10 @@ def _(mo):
         for (let button of buttons) {
           button.addEventListener("click", () => {
             playTone(notes[button.id.toUpperCase()]);
+
             button.classList.add("animate");
 
-            // remove the class after the animation finishes
+            // 2. Remove the class after the animation finishes
             button.addEventListener(
               "animationend",
               () => {
@@ -214,7 +222,6 @@ def _(mo):
 
           oscillator.stop(audioCtx.currentTime + 0.5);
         }
-        // need this otherwise app mode does not listen for keyboard events
         const targetWindows = [window, window.parent];
         targetWindows.forEach((win) => {
           try {
