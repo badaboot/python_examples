@@ -1,5 +1,3 @@
-# Copyright 2024 Marimo. All rights reserved.
-
 import marimo
 
 __generated_with = "0.17.6"
@@ -167,10 +165,10 @@ def _(alt, pl):
     packing_plot = (
         (bubbles + labels)
         .properties(
-            width=480,
+            width=440,
             height=400,
             title=alt.TitleParams(
-    
+
                 text="Character Name + Ethnicity", anchor="middle", fontSize=24
             ),
         )
