@@ -1,4 +1,14 @@
 import yt_dlp
+import sys
+
+# python3 download_youtube_video.py 'https://www.youtube.com/watch?v=wAaKxOkdd8c'
+print(f"Received: {sys.argv[0]} file {sys.argv[1]}")
+if len(sys.argv) < 2:
+    print("Usage: python script.py <youtube_url>")
+    sys.exit(1)
+
+url = sys.argv[1]
+print(f"Downloading video from: {url}")
 
 def download_youtube_video(video_url):
     ydl_opts = {
@@ -13,5 +23,4 @@ def download_youtube_video(video_url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([video_url])
 
-url = "https://www.youtube.com/watch?v=8LBAdbpkuIg"
 download_youtube_video(url)
